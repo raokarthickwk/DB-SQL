@@ -52,3 +52,29 @@ select  first_name, salary, row_number() over(partition by first_name order by f
 from employees e 
 )
 select * from cte where row_num>1
+
+-- This example uses the LAG() function to return the sales amount of the current year and the previous year of the group id 1:
+
+SELECT year, amount, LAG(amount, 1) OVER (ORDER BY year) previous_year_sales
+FROM sales
+WHERE group_id = 1;
+
+-- The following example uses the LAG() function to compare the sales of the current year with the sales of the previous year of each product group:
+SELECT year, amount, group_id, LAG(amount, 1) OVER (PARTITION BY group_id ORDER BY year) previous_year_sales
+FROM sales
+
+-- The following example uses the LEAD() function to compare the sales of the current year with the sales of the next year of each product group:
+SELECT year, amount, LEAD(amount, 1) OVER (ORDER BY year) next_year_sales
+FROM sales
+
+-- Alliasing former is without alising, and next one is alliased, it could also be used with partion by too
+select first_name, salary , 
+ntile (4) over (order by salary) as salary_quartile,
+ntile (10) over (order by salary) as salary_tentile
+from employees e 
+
+select first_name, salary , 
+ntile (4) over ntile_window as quartile,
+ntile (10) over ntile_window as tentile
+from employees e 
+window ntile_window as (order by salary)
